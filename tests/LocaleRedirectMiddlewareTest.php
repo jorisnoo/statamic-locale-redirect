@@ -112,4 +112,42 @@ class LocaleRedirectMiddlewareTest extends TestCase
             ->assertRedirect('/fr')
             ->assertStatus(302);
     }
+
+    public function test_only_config_restricts_matching_to_specified_locales(): void
+    {
+        config(['locale-redirect.only' => ['en', 'fr']]);
+
+        $this->get('/', ['Accept-Language' => 'de,fr;q=0.8'])
+            ->assertRedirect('/fr')
+            ->assertStatus(302);
+    }
+
+    public function test_only_config_with_no_match_does_not_redirect(): void
+    {
+        config(['locale-redirect.only' => ['en']]);
+
+        $this->get('/', ['Accept-Language' => 'fr,de;q=0.9'])
+            ->assertOk();
+    }
+
+    public function test_only_takes_precedence_over_exclude(): void
+    {
+        config([
+            'locale-redirect.only' => ['en', 'fr'],
+            'locale-redirect.exclude' => ['fr'],
+        ]);
+
+        $this->get('/', ['Accept-Language' => 'fr'])
+            ->assertRedirect('/fr')
+            ->assertStatus(302);
+    }
+
+    public function test_all_locales_considered_when_only_not_configured(): void
+    {
+        config(['locale-redirect.only' => []]);
+
+        $this->get('/', ['Accept-Language' => 'de'])
+            ->assertRedirect('/de')
+            ->assertStatus(302);
+    }
 }
