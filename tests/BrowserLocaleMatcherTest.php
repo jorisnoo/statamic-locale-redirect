@@ -1,8 +1,8 @@
 <?php
 
-namespace Noordermeer\LocaleRedirect\Tests;
+namespace Noo\LocaleRedirect\Tests;
 
-use Noordermeer\LocaleRedirect\BrowserLocaleMatcher;
+use Noo\LocaleRedirect\BrowserLocaleMatcher;
 
 class BrowserLocaleMatcherTest extends TestCase
 {

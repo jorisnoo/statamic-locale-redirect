@@ -1,8 +1,8 @@
 <?php
 
-namespace Noordermeer\LocaleRedirect\Tests;
+namespace Noo\LocaleRedirect\Tests;
 
-use Noordermeer\LocaleRedirect\SiteLocaleReader;
+use Noo\LocaleRedirect\SiteLocaleReader;
 use Statamic\Facades\Site;
 
 class SiteLocaleReaderTest extends TestCase

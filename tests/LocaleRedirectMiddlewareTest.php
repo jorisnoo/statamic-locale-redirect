@@ -1,6 +1,6 @@
 <?php
 
-namespace Noordermeer\LocaleRedirect\Tests;
+namespace Noo\LocaleRedirect\Tests;
 
 use Statamic\Facades\Site;
 

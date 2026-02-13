@@ -1,8 +1,8 @@
 <?php
 
-namespace Noordermeer\LocaleRedirect\Tests;
+namespace Noo\LocaleRedirect\Tests;
 
-use Noordermeer\LocaleRedirect\ServiceProvider;
+use Noo\LocaleRedirect\ServiceProvider;
 use Statamic\Testing\AddonTestCase;
 
 abstract class TestCase extends AddonTestCase
