@@ -1,9 +1,5 @@
 # Statamic Locale Redirect
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/noordermeer/statamic-locale-redirect.svg?style=flat-square)](https://packagist.org/packages/noordermeer/statamic-locale-redirect)
-[![Tests](https://github.com/noordermeer/statamic-locale-redirect/actions/workflows/tests.yml/badge.svg)](https://github.com/noordermeer/statamic-locale-redirect/actions/workflows/tests.yml)
-[![License](https://img.shields.io/packagist/l/noordermeer/statamic-locale-redirect.svg?style=flat-square)](https://packagist.org/packages/noordermeer/statamic-locale-redirect)
-
 A Statamic addon that automatically redirects visitors from `/` to their locale-specific home route based on their browser language preferences.
 
 ## Features
