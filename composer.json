@@ -1,5 +1,5 @@
 {
-    "name": "noordermeer/statamic-locale-redirect",
+    "name": "jorisnoo/statamic-locale-redirect",
     "description": "A Statamic addon that redirects visitors to the locale-specific home route.",
     "keywords": ["statamic", "locale", "redirect", "language", "i18n"],
     "license": "MIT",
