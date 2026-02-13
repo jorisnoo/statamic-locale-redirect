@@ -41,7 +41,8 @@
         "Handles partial matches (e.g., browser sends en-US, site has en)"
       ],
       "priority": 1,
-      "passes": false
+      "passes": true,
+      "inProgress": false
     },
     {
       "id": "US-004",
