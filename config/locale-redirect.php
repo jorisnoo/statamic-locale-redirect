@@ -27,4 +27,16 @@ return [
 
     'only' => [],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Fallback URL
+    |--------------------------------------------------------------------------
+    |
+    | The URL to redirect to when no browser locale matches or when a bot
+    | visits the root URL. When null, the default Statamic site URL is used.
+    |
+    */
+
+    'fallback' => null,
+
 ];

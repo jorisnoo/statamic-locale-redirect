@@ -2,25 +2,23 @@
 
 namespace Noo\LocaleRedirect;
 
-use Closure;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Statamic\Facades\Site;
 
-class LocaleRedirectMiddleware
+class LocaleRedirectController
 {
     public function __construct(
         private SiteLocaleReader $siteLocaleReader,
         private BrowserLocaleMatcher $browserLocaleMatcher,
     ) {}
 
-    public function handle(Request $request, Closure $next): Response
+    public function __invoke(Request $request): RedirectResponse
     {
-        if ($request->path() !== '/') {
-            return $next($request);
-        }
+        $fallbackUrl = $this->fallbackUrl();
 
         if ($this->isBot($request)) {
-            return $next($request);
+            return redirect($fallbackUrl, 302);
         }
 
         $localeUrlMap = $this->siteLocaleReader->getLocaleUrlMap();
@@ -33,10 +31,15 @@ class LocaleRedirectMiddleware
         );
 
         if ($matchedLocale === null) {
-            return $next($request);
+            return redirect($fallbackUrl, 302);
         }
 
         return redirect($localeUrlMap[$matchedLocale], 302);
+    }
+
+    private function fallbackUrl(): string
+    {
+        return config('statamic.locale-redirect.fallback') ?? Site::default()->url();
     }
 
     /**

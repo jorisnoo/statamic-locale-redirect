@@ -27,30 +27,34 @@ test('it respects browser language priority', function () {
         ->assertStatus(302);
 });
 
-test('it does not redirect when no locale matches', function () {
+test('it redirects to default site when no locale matches', function () {
     $this->get('/', ['Accept-Language' => 'ja,zh;q=0.9'])
-        ->assertOk();
+        ->assertRedirect('/en')
+        ->assertStatus(302);
 });
 
-test('it does not redirect bots', function () {
+test('it redirects bots to default site', function () {
     $this->get('/', [
         'Accept-Language' => 'fr',
         'User-Agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-    ])->assertOk();
+    ])->assertRedirect('/en')
+        ->assertStatus(302);
 });
 
-test('it does not redirect crawlers', function () {
+test('it redirects crawlers to default site', function () {
     $this->get('/', [
         'Accept-Language' => 'fr',
         'User-Agent' => 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
-    ])->assertOk();
+    ])->assertRedirect('/en')
+        ->assertStatus(302);
 });
 
-test('it does not redirect requests without user agent', function () {
+test('it redirects requests without user agent to default site', function () {
     $this->get('/', [
         'Accept-Language' => 'fr',
         'User-Agent' => '',
-    ])->assertOk();
+    ])->assertRedirect('/en')
+        ->assertStatus(302);
 });
 
 test('it does not intercept non home routes', function () {
@@ -73,11 +77,12 @@ test('excluded locales are skipped during matching', function () {
         ->assertStatus(302);
 });
 
-test('excluded locale with no fallback does not redirect', function () {
+test('excluded locale with no fallback match redirects to default site', function () {
     config(['statamic.locale-redirect.exclude' => ['fr']]);
 
     $this->get('/', ['Accept-Language' => 'fr'])
-        ->assertOk();
+        ->assertRedirect('/en')
+        ->assertStatus(302);
 });
 
 test('no locales excluded by default', function () {
@@ -94,11 +99,12 @@ test('only config restricts matching to specified locales', function () {
         ->assertStatus(302);
 });
 
-test('only config with no match does not redirect', function () {
+test('only config with no match redirects to default site', function () {
     config(['statamic.locale-redirect.only' => ['en']]);
 
     $this->get('/', ['Accept-Language' => 'fr,de;q=0.9'])
-        ->assertOk();
+        ->assertRedirect('/en')
+        ->assertStatus(302);
 });
 
 test('only takes precedence over exclude', function () {
@@ -117,5 +123,23 @@ test('all locales considered when only not configured', function () {
 
     $this->get('/', ['Accept-Language' => 'de'])
         ->assertRedirect('/de')
+        ->assertStatus(302);
+});
+
+test('fallback redirects to configured url when set', function () {
+    config(['statamic.locale-redirect.fallback' => '/custom-landing']);
+
+    $this->get('/', ['Accept-Language' => 'ja'])
+        ->assertRedirect('/custom-landing')
+        ->assertStatus(302);
+});
+
+test('bot redirects to configured fallback url when set', function () {
+    config(['statamic.locale-redirect.fallback' => '/custom-landing']);
+
+    $this->get('/', [
+        'Accept-Language' => 'fr',
+        'User-Agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+    ])->assertRedirect('/custom-landing')
         ->assertStatus(302);
 });
