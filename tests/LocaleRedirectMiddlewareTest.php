@@ -1,153 +1,121 @@
 <?php
 
-namespace Noo\LocaleRedirect\Tests;
-
 use Statamic\Facades\Site;
 
-class LocaleRedirectMiddlewareTest extends TestCase
-{
-    private function setSites(array $sites): void
-    {
-        config(['statamic.system.multisite' => count($sites) > 1]);
-        config(['statamic.editions.pro' => true]);
+uses(Noo\LocaleRedirect\Tests\Concerns\DefinesWebRoutes::class);
 
-        Site::setSites($sites);
-    }
+beforeEach(function () {
+    config(['statamic.system.multisite' => true]);
+    config(['statamic.editions.pro' => true]);
 
-    protected function defineWebRoutes($router): void
-    {
-        $router->get('/', fn () => response('homepage'));
-        $router->get('/about', fn () => response('about'));
-    }
+    Site::setSites([
+        'en' => ['name' => 'English', 'url' => '/en', 'locale' => 'en_US'],
+        'fr' => ['name' => 'French', 'url' => '/fr', 'locale' => 'fr_FR'],
+        'de' => ['name' => 'German', 'url' => '/de', 'locale' => 'de_DE'],
+    ]);
+});
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+test('it redirects to matched locale home url', function () {
+    $this->get('/', ['Accept-Language' => 'fr'])
+        ->assertRedirect('/fr')
+        ->assertStatus(302);
+});
 
-        $this->setSites([
-            'en' => ['name' => 'English', 'url' => '/en', 'locale' => 'en_US'],
-            'fr' => ['name' => 'French', 'url' => '/fr', 'locale' => 'fr_FR'],
-            'de' => ['name' => 'German', 'url' => '/de', 'locale' => 'de_DE'],
-        ]);
-    }
+test('it respects browser language priority', function () {
+    $this->get('/', ['Accept-Language' => 'en-US,en;q=0.9,fr;q=0.8'])
+        ->assertRedirect('/en')
+        ->assertStatus(302);
+});
 
-    public function test_it_redirects_to_matched_locale_home_url(): void
-    {
-        $this->get('/', ['Accept-Language' => 'fr'])
-            ->assertRedirect('/fr')
-            ->assertStatus(302);
-    }
+test('it does not redirect when no locale matches', function () {
+    $this->get('/', ['Accept-Language' => 'ja,zh;q=0.9'])
+        ->assertOk();
+});
 
-    public function test_it_respects_browser_language_priority(): void
-    {
-        $this->get('/', ['Accept-Language' => 'en-US,en;q=0.9,fr;q=0.8'])
-            ->assertRedirect('/en')
-            ->assertStatus(302);
-    }
+test('it does not redirect bots', function () {
+    $this->get('/', [
+        'Accept-Language' => 'fr',
+        'User-Agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+    ])->assertOk();
+});
 
-    public function test_it_does_not_redirect_when_no_locale_matches(): void
-    {
-        $this->get('/', ['Accept-Language' => 'ja,zh;q=0.9'])
-            ->assertOk();
-    }
+test('it does not redirect crawlers', function () {
+    $this->get('/', [
+        'Accept-Language' => 'fr',
+        'User-Agent' => 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
+    ])->assertOk();
+});
 
-    public function test_it_does_not_redirect_bots(): void
-    {
-        $this->get('/', [
-            'Accept-Language' => 'fr',
-            'User-Agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-        ])->assertOk();
-    }
+test('it does not redirect requests without user agent', function () {
+    $this->get('/', [
+        'Accept-Language' => 'fr',
+        'User-Agent' => '',
+    ])->assertOk();
+});
 
-    public function test_it_does_not_redirect_crawlers(): void
-    {
-        $this->get('/', [
-            'Accept-Language' => 'fr',
-            'User-Agent' => 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
-        ])->assertOk();
-    }
+test('it does not intercept non home routes', function () {
+    $this->get('/about', ['Accept-Language' => 'fr'])
+        ->assertOk()
+        ->assertSee('about');
+});
 
-    public function test_it_does_not_redirect_requests_without_user_agent(): void
-    {
-        $this->get('/', [
-            'Accept-Language' => 'fr',
-            'User-Agent' => '',
-        ])->assertOk();
-    }
+test('it handles partial locale match', function () {
+    $this->get('/', ['Accept-Language' => 'de-DE,de;q=0.9'])
+        ->assertRedirect('/de')
+        ->assertStatus(302);
+});
 
-    public function test_it_does_not_intercept_non_home_routes(): void
-    {
-        $this->get('/about', ['Accept-Language' => 'fr'])
-            ->assertOk()
-            ->assertSee('about');
-    }
+test('excluded locales are skipped during matching', function () {
+    config(['locale-redirect.exclude' => ['fr']]);
 
-    public function test_it_handles_partial_locale_match(): void
-    {
-        $this->get('/', ['Accept-Language' => 'de-DE,de;q=0.9'])
-            ->assertRedirect('/de')
-            ->assertStatus(302);
-    }
+    $this->get('/', ['Accept-Language' => 'fr,en;q=0.8'])
+        ->assertRedirect('/en')
+        ->assertStatus(302);
+});
 
-    public function test_excluded_locales_are_skipped_during_matching(): void
-    {
-        config(['locale-redirect.exclude' => ['fr']]);
+test('excluded locale with no fallback does not redirect', function () {
+    config(['locale-redirect.exclude' => ['fr']]);
 
-        $this->get('/', ['Accept-Language' => 'fr,en;q=0.8'])
-            ->assertRedirect('/en')
-            ->assertStatus(302);
-    }
+    $this->get('/', ['Accept-Language' => 'fr'])
+        ->assertOk();
+});
 
-    public function test_excluded_locale_with_no_fallback_does_not_redirect(): void
-    {
-        config(['locale-redirect.exclude' => ['fr']]);
+test('no locales excluded by default', function () {
+    $this->get('/', ['Accept-Language' => 'fr'])
+        ->assertRedirect('/fr')
+        ->assertStatus(302);
+});
 
-        $this->get('/', ['Accept-Language' => 'fr'])
-            ->assertOk();
-    }
+test('only config restricts matching to specified locales', function () {
+    config(['locale-redirect.only' => ['en', 'fr']]);
 
-    public function test_no_locales_excluded_by_default(): void
-    {
-        $this->get('/', ['Accept-Language' => 'fr'])
-            ->assertRedirect('/fr')
-            ->assertStatus(302);
-    }
+    $this->get('/', ['Accept-Language' => 'de,fr;q=0.8'])
+        ->assertRedirect('/fr')
+        ->assertStatus(302);
+});
 
-    public function test_only_config_restricts_matching_to_specified_locales(): void
-    {
-        config(['locale-redirect.only' => ['en', 'fr']]);
+test('only config with no match does not redirect', function () {
+    config(['locale-redirect.only' => ['en']]);
 
-        $this->get('/', ['Accept-Language' => 'de,fr;q=0.8'])
-            ->assertRedirect('/fr')
-            ->assertStatus(302);
-    }
+    $this->get('/', ['Accept-Language' => 'fr,de;q=0.9'])
+        ->assertOk();
+});
 
-    public function test_only_config_with_no_match_does_not_redirect(): void
-    {
-        config(['locale-redirect.only' => ['en']]);
+test('only takes precedence over exclude', function () {
+    config([
+        'locale-redirect.only' => ['en', 'fr'],
+        'locale-redirect.exclude' => ['fr'],
+    ]);
 
-        $this->get('/', ['Accept-Language' => 'fr,de;q=0.9'])
-            ->assertOk();
-    }
+    $this->get('/', ['Accept-Language' => 'fr'])
+        ->assertRedirect('/fr')
+        ->assertStatus(302);
+});
 
-    public function test_only_takes_precedence_over_exclude(): void
-    {
-        config([
-            'locale-redirect.only' => ['en', 'fr'],
-            'locale-redirect.exclude' => ['fr'],
-        ]);
+test('all locales considered when only not configured', function () {
+    config(['locale-redirect.only' => []]);
 
-        $this->get('/', ['Accept-Language' => 'fr'])
-            ->assertRedirect('/fr')
-            ->assertStatus(302);
-    }
-
-    public function test_all_locales_considered_when_only_not_configured(): void
-    {
-        config(['locale-redirect.only' => []]);
-
-        $this->get('/', ['Accept-Language' => 'de'])
-            ->assertRedirect('/de')
-            ->assertStatus(302);
-    }
-}
+    $this->get('/', ['Accept-Language' => 'de'])
+        ->assertRedirect('/de')
+        ->assertStatus(302);
+});
