@@ -1,0 +1,49 @@
+{
+    "name": "noordermeer/statamic-locale-redirect",
+    "description": "A Statamic addon that automatically redirects visitors from the home route to the locale-specific home route based on their browser's Accept-Language header.",
+    "keywords": ["statamic", "locale", "redirect", "language", "i18n"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joris Noordermeer",
+            "email": "joris@noordermeer.ch"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "statamic/cms": "^5.0 || ^6.0",
+        "koenster/php-language-detection": "^1.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0 || ^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Noordermeer\\LocaleRedirect\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Noordermeer\\LocaleRedirect\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Locale Redirect",
+            "description": "Automatically redirects visitors to their locale-specific home route."
+        },
+        "laravel": {
+            "providers": [
+                "Noordermeer\\LocaleRedirect\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    }
+}
