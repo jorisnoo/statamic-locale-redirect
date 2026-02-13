@@ -1,0 +1,115 @@
+{
+  "project": "Statamic Locale Redirect",
+  "description": "A Statamic addon that automatically redirects visitors from the home route (/) to the locale-specific home route (e.g., /en, /fr) based on their browser's Accept-Language header. It works zero-config by reading Statamic's configured sites, and optionally supports a publishable config file for excluding or restricting locales. Targets Statamic 5 and 6. Uses koester/php-language-detection for parsing and matching the Accept-Language header.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Package Scaffolding",
+      "description": "As a developer, I want a properly structured Statamic addon package so that it can be installed via Composer and auto-discovered by Statamic.",
+      "acceptanceCriteria": [
+        "composer.json with package name, description, PHP 8.2+ requirement, Statamic 5/6 compatibility, autoload config, and koester/php-language-detection dependency",
+        "Service provider registered via extra.laravel.providers in composer.json",
+        "Service provider extends Statamic\\Providers\\AddonServiceProvider",
+        "Package follows standard Statamic addon directory structure (src/, config/, routes/)"
+      ],
+      "priority": 1,
+      "passes": true,
+      "inProgress": false
+    },
+    {
+      "id": "US-002",
+      "title": "Read Statamic Site Locales",
+      "description": "As the plugin, I need to read the configured Statamic sites and extract their locale codes and home URLs so that I can determine valid redirect targets.",
+      "acceptanceCriteria": [
+        "Reads all configured sites from Statamic's Site facade",
+        "Extracts each site's locale (e.g., en, fr, de) and its URL/prefix",
+        "Returns a structured mapping of locale =\u003e home URL",
+        "Works with prefix-based multi-site setups (/en, /fr)"
+      ],
+      "priority": 1,
+      "passes": true,
+      "inProgress": false
+    },
+    {
+      "id": "US-003",
+      "title": "Match Browser Locale to Site Locale",
+      "description": "As the plugin, I need to parse the visitor's Accept-Language header and find the best matching Statamic site locale so that I can redirect to the correct localized home page.",
+      "acceptanceCriteria": [
+        "Uses koester/php-language-detection to parse the Accept-Language header",
+        "Matches browser preferred languages against available Statamic site locales",
+        "Respects browser language priority/quality values (q-values)",
+        "Handles partial matches (e.g., browser sends en-US, site has en)"
+      ],
+      "priority": 1,
+      "passes": false
+    },
+    {
+      "id": "US-004",
+      "title": "Redirect Home Route to Matched Locale",
+      "description": "As a visitor hitting /, I want to be automatically redirected to my locale's home page (e.g., /fr) so that I see content in my preferred language.",
+      "acceptanceCriteria": [
+        "Only intercepts the / route — no other routes are affected",
+        "Issues a 302 (temporary) redirect to the matched locale's home URL",
+        "If no browser locale matches any site locale, does not redirect (falls through to default site/route handling)",
+        "Does not redirect if the request is from a bot/crawler (respects non-browser requests gracefully)"
+      ],
+      "priority": 1,
+      "passes": false
+    },
+    {
+      "id": "US-005",
+      "title": "Optional Config — Exclude Locales",
+      "description": "As a site administrator, I want to exclude specific locales from being redirect targets so that I can prevent redirects to locales that aren't fully ready or shouldn't be auto-redirected to.",
+      "acceptanceCriteria": [
+        "Config key \"exclude\" accepts an array of locale codes (e.g., ['de', 'it'])",
+        "Excluded locales are ignored when matching the browser's Accept-Language",
+        "Works alongside the \"only\" config (US-006) — if both are set, \"only\" takes precedence",
+        "When not configured, no locales are excluded (all sites are candidates)"
+      ],
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "US-006",
+      "title": "Optional Config — Restrict to Specific Locales",
+      "description": "As a site administrator, I want to define an explicit list of locales to consider for redirection so that I have precise control over which locales participate.",
+      "acceptanceCriteria": [
+        "Config key \"only\" accepts an array of locale codes (e.g., ['en', 'fr'])",
+        "Only listed locales are considered when matching the browser's Accept-Language",
+        "Takes precedence over \"exclude\" if both are set",
+        "When not configured, all Statamic site locales are considered"
+      ],
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "US-007",
+      "title": "Publishable Config File",
+      "description": "As a site administrator, I want to publish the config file so that I can customize the plugin behavior without modifying vendor files.",
+      "acceptanceCriteria": [
+        "Default config file at config/locale-redirect.php in the package",
+        "Config is publishable via php artisan vendor:publish --tag=locale-redirect-config",
+        "Config is merged with defaults in the service provider (mergeConfigFrom)",
+        "Default config has \"exclude\" as empty array and \"only\" as empty array (meaning: consider all locales)"
+      ],
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "US-008",
+      "title": "Tests",
+      "description": "As a developer, I want automated tests so that I can verify the plugin works correctly and prevent regressions.",
+      "acceptanceCriteria": [
+        "Test: visitor with Accept-Language: fr hitting / gets 302 to /fr",
+        "Test: visitor with Accept-Language: en-US,en;q=0.9,fr;q=0.8 hitting / gets 302 to /en",
+        "Test: visitor with unmatched locale (e.g., ja) hitting / gets no redirect (falls through)",
+        "Test: excluded locales are skipped during matching",
+        "Test: \"only\" config restricts matching to specified locales",
+        "Test: requests to non-home routes (e.g., /about) are not intercepted",
+        "Uses Orchestra Testbench with Statamic for integration testing"
+      ],
+      "priority": 3,
+      "passes": false
+    }
+  ]
+}
