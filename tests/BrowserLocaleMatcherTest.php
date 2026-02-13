@@ -1,80 +1,69 @@
 <?php
 
-namespace Noo\LocaleRedirect\Tests;
-
 use Noo\LocaleRedirect\BrowserLocaleMatcher;
 
-class BrowserLocaleMatcherTest extends TestCase
-{
-    public function test_it_matches_exact_browser_locale_to_site_locale(): void
-    {
-        $matcher = new BrowserLocaleMatcher();
+test('it matches exact browser locale to site locale', function () {
+    $matcher = new BrowserLocaleMatcher();
 
-        $result = $matcher->match(
-            availableLocales: ['en', 'fr'],
-            acceptLanguageHeader: 'fr'
-        );
+    $result = $matcher->match(
+        availableLocales: ['en', 'fr'],
+        acceptLanguageHeader: 'fr'
+    );
 
-        $this->assertSame('fr', $result);
-    }
+    expect($result)->toBe('fr');
+});
 
-    public function test_it_respects_quality_values_and_returns_highest_priority_match(): void
-    {
-        $matcher = new BrowserLocaleMatcher();
+test('it respects quality values and returns highest priority match', function () {
+    $matcher = new BrowserLocaleMatcher();
 
-        $result = $matcher->match(
-            availableLocales: ['en', 'fr'],
-            acceptLanguageHeader: 'en-US,en;q=0.9,fr;q=0.8'
-        );
+    $result = $matcher->match(
+        availableLocales: ['en', 'fr'],
+        acceptLanguageHeader: 'en-US,en;q=0.9,fr;q=0.8'
+    );
 
-        $this->assertSame('en', $result);
-    }
+    expect($result)->toBe('en');
+});
 
-    public function test_it_handles_partial_match_when_browser_sends_full_locale(): void
-    {
-        $matcher = new BrowserLocaleMatcher();
+test('it handles partial match when browser sends full locale', function () {
+    $matcher = new BrowserLocaleMatcher();
 
-        $result = $matcher->match(
-            availableLocales: ['en', 'fr', 'de'],
-            acceptLanguageHeader: 'de-DE,de;q=0.9'
-        );
+    $result = $matcher->match(
+        availableLocales: ['en', 'fr', 'de'],
+        acceptLanguageHeader: 'de-DE,de;q=0.9'
+    );
 
-        $this->assertSame('de', $result);
-    }
+    expect($result)->toBe('de');
+});
 
-    public function test_it_returns_null_when_no_locale_matches(): void
-    {
-        $matcher = new BrowserLocaleMatcher();
+test('it returns null when no locale matches', function () {
+    $matcher = new BrowserLocaleMatcher();
 
-        $result = $matcher->match(
-            availableLocales: ['en', 'fr'],
-            acceptLanguageHeader: 'ja,zh;q=0.9'
-        );
+    $result = $matcher->match(
+        availableLocales: ['en', 'fr'],
+        acceptLanguageHeader: 'ja,zh;q=0.9'
+    );
 
-        $this->assertNull($result);
-    }
+    expect($result)->toBeNull();
+});
 
-    public function test_it_returns_null_for_empty_accept_language_header(): void
-    {
-        $matcher = new BrowserLocaleMatcher();
+test('it returns null for empty accept language header', function () {
+    $matcher = new BrowserLocaleMatcher();
 
-        $result = $matcher->match(
-            availableLocales: ['en', 'fr'],
-            acceptLanguageHeader: ''
-        );
+    $result = $matcher->match(
+        availableLocales: ['en', 'fr'],
+        acceptLanguageHeader: ''
+    );
 
-        $this->assertNull($result);
-    }
+    expect($result)->toBeNull();
+});
 
-    public function test_it_matches_lower_priority_locale_when_higher_is_unavailable(): void
-    {
-        $matcher = new BrowserLocaleMatcher();
+test('it matches lower priority locale when higher is unavailable', function () {
+    $matcher = new BrowserLocaleMatcher();
 
-        $result = $matcher->match(
-            availableLocales: ['fr', 'de'],
-            acceptLanguageHeader: 'en-US,en;q=0.9,fr;q=0.8'
-        );
+    $result = $matcher->match(
+        availableLocales: ['fr', 'de'],
+        acceptLanguageHeader: 'en-US,en;q=0.9,fr;q=0.8'
+    );
 
-        $this->assertSame('fr', $result);
-    }
-}
+    expect($result)->toBe('fr');
+});
