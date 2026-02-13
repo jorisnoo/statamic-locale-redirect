@@ -1,6 +1,6 @@
 <?php
 
-namespace Noordermeer\LocaleRedirect;
+namespace Noo\LocaleRedirect;
 
 use Statamic\Providers\AddonServiceProvider;
 
