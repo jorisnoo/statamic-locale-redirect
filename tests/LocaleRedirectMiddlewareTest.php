@@ -66,7 +66,7 @@ test('it handles partial locale match', function () {
 });
 
 test('excluded locales are skipped during matching', function () {
-    config(['locale-redirect.exclude' => ['fr']]);
+    config(['statamic.locale-redirect.exclude' => ['fr']]);
 
     $this->get('/', ['Accept-Language' => 'fr,en;q=0.8'])
         ->assertRedirect('/en')
@@ -74,7 +74,7 @@ test('excluded locales are skipped during matching', function () {
 });
 
 test('excluded locale with no fallback does not redirect', function () {
-    config(['locale-redirect.exclude' => ['fr']]);
+    config(['statamic.locale-redirect.exclude' => ['fr']]);
 
     $this->get('/', ['Accept-Language' => 'fr'])
         ->assertOk();
@@ -87,7 +87,7 @@ test('no locales excluded by default', function () {
 });
 
 test('only config restricts matching to specified locales', function () {
-    config(['locale-redirect.only' => ['en', 'fr']]);
+    config(['statamic.locale-redirect.only' => ['en', 'fr']]);
 
     $this->get('/', ['Accept-Language' => 'de,fr;q=0.8'])
         ->assertRedirect('/fr')
@@ -95,7 +95,7 @@ test('only config restricts matching to specified locales', function () {
 });
 
 test('only config with no match does not redirect', function () {
-    config(['locale-redirect.only' => ['en']]);
+    config(['statamic.locale-redirect.only' => ['en']]);
 
     $this->get('/', ['Accept-Language' => 'fr,de;q=0.9'])
         ->assertOk();
@@ -103,8 +103,8 @@ test('only config with no match does not redirect', function () {
 
 test('only takes precedence over exclude', function () {
     config([
-        'locale-redirect.only' => ['en', 'fr'],
-        'locale-redirect.exclude' => ['fr'],
+        'statamic.locale-redirect.only' => ['en', 'fr'],
+        'statamic.locale-redirect.exclude' => ['fr'],
     ]);
 
     $this->get('/', ['Accept-Language' => 'fr'])
@@ -113,7 +113,7 @@ test('only takes precedence over exclude', function () {
 });
 
 test('all locales considered when only not configured', function () {
-    config(['locale-redirect.only' => []]);
+    config(['statamic.locale-redirect.only' => []]);
 
     $this->get('/', ['Accept-Language' => 'de'])
         ->assertRedirect('/de')

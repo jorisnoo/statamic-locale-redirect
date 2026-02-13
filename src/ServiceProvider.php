@@ -14,10 +14,10 @@ class ServiceProvider extends AddonServiceProvider
 
     public function bootAddon(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/locale-redirect.php', 'locale-redirect');
+        $this->mergeConfigFrom(__DIR__ . '/../config/locale-redirect.php', 'statamic.locale-redirect');
 
         $this->publishes([
-            __DIR__ . '/../config/locale-redirect.php' => config_path('locale-redirect.php'),
-        ], 'locale-redirect-config');
+            __DIR__ . '/../config/locale-redirect.php' => config_path('statamic/locale-redirect.php'),
+        ], 'statamic-locale-redirect');
     }
 }

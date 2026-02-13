@@ -45,13 +45,13 @@ class LocaleRedirectMiddleware
      */
     private function filterLocales(array $localeUrlMap): array
     {
-        $only = config('locale-redirect.only', []);
+        $only = config('statamic.locale-redirect.only', []);
 
         if (! empty($only)) {
             return array_intersect_key($localeUrlMap, array_flip($only));
         }
 
-        $exclude = config('locale-redirect.exclude', []);
+        $exclude = config('statamic.locale-redirect.exclude', []);
 
         if (! empty($exclude)) {
             return array_diff_key($localeUrlMap, array_flip($exclude));
