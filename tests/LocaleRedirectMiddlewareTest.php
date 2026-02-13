@@ -88,4 +88,28 @@ class LocaleRedirectMiddlewareTest extends TestCase
             ->assertRedirect('/de')
             ->assertStatus(302);
     }
+
+    public function test_excluded_locales_are_skipped_during_matching(): void
+    {
+        config(['locale-redirect.exclude' => ['fr']]);
+
+        $this->get('/', ['Accept-Language' => 'fr,en;q=0.8'])
+            ->assertRedirect('/en')
+            ->assertStatus(302);
+    }
+
+    public function test_excluded_locale_with_no_fallback_does_not_redirect(): void
+    {
+        config(['locale-redirect.exclude' => ['fr']]);
+
+        $this->get('/', ['Accept-Language' => 'fr'])
+            ->assertOk();
+    }
+
+    public function test_no_locales_excluded_by_default(): void
+    {
+        $this->get('/', ['Accept-Language' => 'fr'])
+            ->assertRedirect('/fr')
+            ->assertStatus(302);
+    }
 }

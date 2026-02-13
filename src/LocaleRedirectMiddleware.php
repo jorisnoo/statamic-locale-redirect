@@ -24,6 +24,7 @@ class LocaleRedirectMiddleware
         }
 
         $localeUrlMap = $this->siteLocaleReader->getLocaleUrlMap();
+        $localeUrlMap = $this->filterLocales($localeUrlMap);
         $availableLocales = array_keys($localeUrlMap);
 
         $matchedLocale = $this->browserLocaleMatcher->match(
@@ -36,6 +37,27 @@ class LocaleRedirectMiddleware
         }
 
         return redirect($localeUrlMap[$matchedLocale], 302);
+    }
+
+    /**
+     * @param array<string, string> $localeUrlMap
+     * @return array<string, string>
+     */
+    private function filterLocales(array $localeUrlMap): array
+    {
+        $only = config('locale-redirect.only', []);
+
+        if (! empty($only)) {
+            return array_intersect_key($localeUrlMap, array_flip($only));
+        }
+
+        $exclude = config('locale-redirect.exclude', []);
+
+        if (! empty($exclude)) {
+            return array_diff_key($localeUrlMap, array_flip($exclude));
+        }
+
+        return $localeUrlMap;
     }
 
     private function isBot(Request $request): bool
