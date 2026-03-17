@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/v0.1.1) (2026-03-17)
+
+### Code Refactoring
+
+- **routes:** remove route name from locale redirect ([03fe519](https://github.com/jorisnoo/statamic-locale-redirect/commit/03fe519c60e63afd1f169ae7f33e7b7e7b3f6d41))
+
+### Chores
+
+- add shipmark release configuration ([92f6662](https://github.com/jorisnoo/statamic-locale-redirect/commit/92f66629b9e1ee11e7432162d5579144f97b4d93))
 ## [0.1.0](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/v0.1.0) (2026-03-17)
 
 ### Features
