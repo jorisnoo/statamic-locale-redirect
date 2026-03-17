@@ -12,7 +12,7 @@ class ServiceProvider extends AddonServiceProvider
 
         $this->publishes([
             __DIR__ . '/../config/locale-redirect.php' => config_path('statamic/locale-redirect.php'),
-        ], 'statamic-locale-redirect');
+        ], 'locale-redirect');
 
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
     }

@@ -11,8 +11,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "statamic/cms": "^5.0 || ^6.0",
-        "koenster/php-language-detection": "^1.0"
+        "statamic/cms": "^5.0 || ^6.0"
     },
     "require-dev": {
         "orchestra/testbench": "^9.0 || ^10.0",

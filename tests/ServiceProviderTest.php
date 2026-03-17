@@ -27,9 +27,9 @@ test('default config has null fallback', function () {
 test('config is publishable', function () {
     $publishGroups = ServiceProvider::$publishGroups;
 
-    expect($publishGroups)->toHaveKey('statamic-locale-redirect');
+    expect($publishGroups)->toHaveKey('locale-redirect');
 
-    $paths = $publishGroups['statamic-locale-redirect'];
+    $paths = $publishGroups['locale-redirect'];
     $sourceFiles = array_keys($paths);
     $destinationFiles = array_values($paths);
 

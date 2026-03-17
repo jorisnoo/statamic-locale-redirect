@@ -2,8 +2,6 @@
 
 namespace Noo\LocaleRedirect;
 
-use koenster\PHPLanguageDetection\BrowserLocalization;
-
 class BrowserLocaleMatcher
 {
     /**
@@ -15,18 +13,51 @@ class BrowserLocaleMatcher
             return null;
         }
 
-        $browser = new BrowserLocalization();
+        $preferences = $this->parseAcceptLanguage($acceptLanguageHeader);
 
-        $browser->setAvailable($availableLocales)
-            ->setDefault('')
-            ->setPreferences($acceptLanguageHeader);
-
-        $detected = $browser->detect();
-
-        if ($detected === '') {
-            return null;
+        foreach ($preferences as $preferred) {
+            foreach ($availableLocales as $locale) {
+                if ($locale === $preferred || str_starts_with($preferred, $locale . '-') || str_starts_with($preferred, $locale . '_')) {
+                    return $locale;
+                }
+            }
         }
 
-        return $detected;
+        return null;
+    }
+
+    /**
+     * Parse Accept-Language header into a priority-sorted list of language codes.
+     *
+     * @return array<int, string>
+     */
+    private function parseAcceptLanguage(string $header): array
+    {
+        $entries = [];
+
+        foreach (explode(',', $header) as $part) {
+            $part = trim($part);
+
+            if ($part === '') {
+                continue;
+            }
+
+            $segments = explode(';', $part);
+            $locale = strtolower(trim($segments[0]));
+            $quality = 1.0;
+
+            foreach (array_slice($segments, 1) as $segment) {
+                $segment = trim($segment);
+                if (str_starts_with($segment, 'q=')) {
+                    $quality = (float) substr($segment, 2);
+                }
+            }
+
+            $entries[] = ['locale' => $locale, 'quality' => $quality];
+        }
+
+        usort($entries, fn ($a, $b) => $b['quality'] <=> $a['quality']);
+
+        return array_column($entries, 'locale');
     }
 }

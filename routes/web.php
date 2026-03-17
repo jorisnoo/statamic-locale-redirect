@@ -3,4 +3,5 @@
 use Illuminate\Support\Facades\Route;
 use Noo\LocaleRedirect\LocaleRedirectController;
 
-Route::get('/', LocaleRedirectController::class);
+Route::get('/', LocaleRedirectController::class)
+    ->name('statamic.site');

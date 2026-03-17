@@ -44,7 +44,7 @@ Bots and crawlers (Googlebot, Bingbot, etc.) are automatically excluded from red
 The addon works out of the box with no configuration. To customize behavior, publish the config file:
 
 ```bash
-php artisan vendor:publish --tag=statamic-locale-redirect
+php artisan vendor:publish --tag=locale-redirect
 ```
 
 This creates `config/statamic/locale-redirect.php`:
