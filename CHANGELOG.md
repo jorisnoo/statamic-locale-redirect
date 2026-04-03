@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.2](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/v0.1.2) (2026-04-03)
+
+### Bug Fixes
+
+- prevent caching of locale redirects ([5b17d61](https://github.com/jorisnoo/statamic-locale-redirect/commit/5b17d610c622a3efe06e19c1b5a54a6abde282e0))
+
+### Chores
+
+- add dependabot configuration and auto-merge workflow ([0bf1b5b](https://github.com/jorisnoo/statamic-locale-redirect/commit/0bf1b5b891547eadb5c88f2c86c554df8187425c))
 ## [0.1.1](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/v0.1.1) (2026-03-17)
 
 ### Code Refactoring
