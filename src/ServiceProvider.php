@@ -15,5 +15,17 @@ class ServiceProvider extends AddonServiceProvider
         ], 'locale-redirect');
 
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+
+        $this->excludeFromStaticCache();
+    }
+
+    private function excludeFromStaticCache(): void
+    {
+        $exclude = config('statamic.static_caching.exclude', []);
+
+        if (! in_array('/', $exclude)) {
+            $exclude[] = '/';
+            config(['statamic.static_caching.exclude' => $exclude]);
+        }
     }
 }

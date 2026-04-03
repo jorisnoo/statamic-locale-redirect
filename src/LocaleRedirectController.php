@@ -18,7 +18,7 @@ class LocaleRedirectController
         $fallbackUrl = $this->fallbackUrl();
 
         if ($this->isBot($request)) {
-            return redirect($fallbackUrl, 302);
+            return $this->noCacheRedirect($fallbackUrl);
         }
 
         $localeUrlMap = $this->siteLocaleReader->getLocaleUrlMap();
@@ -31,10 +31,10 @@ class LocaleRedirectController
         );
 
         if ($matchedLocale === null) {
-            return redirect($fallbackUrl, 302);
+            return $this->noCacheRedirect($fallbackUrl);
         }
 
-        return redirect($localeUrlMap[$matchedLocale], 302);
+        return $this->noCacheRedirect($localeUrlMap[$matchedLocale]);
     }
 
     private function fallbackUrl(): string
@@ -61,6 +61,14 @@ class LocaleRedirectController
         }
 
         return $localeUrlMap;
+    }
+
+    private function noCacheRedirect(string $url): RedirectResponse
+    {
+        return redirect($url, 302)->withHeaders([
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Vary' => 'Accept-Language',
+        ]);
     }
 
     private function isBot(Request $request): bool
