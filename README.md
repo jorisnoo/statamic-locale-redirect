@@ -7,7 +7,7 @@ A Statamic addon that automatically redirects visitors from `/` to their locale-
 - Detects the visitor's preferred language from the `Accept-Language` header
 - Matches it against your Statamic multi-site locales
 - Redirects from `/` to the best-matching locale home URL (e.g. `/en`, `/fr`, `/de`)
-- Skips bots and crawlers to preserve SEO
+- Preserves query parameters through the redirect
 - Configurable locale exclusions and restrictions
 - Zero configuration required for basic usage
 
@@ -33,11 +33,7 @@ When a visitor hits your site's root URL (`/`), the middleware:
 3. Finds the best match between browser preferences and available locales
 4. Issues a `302` redirect to the matched locale's home URL
 
-If no match is found or the request isn't to `/`, the request passes through unchanged.
-
-### Bot Detection
-
-Bots and crawlers (Googlebot, Bingbot, etc.) are automatically excluded from redirection so they can index your root URL normally.
+If no match is found, the visitor is redirected to the default site's URL (or a configured fallback). Query parameters are preserved through the redirect.
 
 ## Configuration
 

@@ -15,12 +15,6 @@ class LocaleRedirectController
 
     public function __invoke(Request $request): RedirectResponse
     {
-        $fallbackUrl = $this->fallbackUrl();
-
-        if ($this->isBot($request)) {
-            return $this->noCacheRedirect($fallbackUrl);
-        }
-
         $localeUrlMap = $this->siteLocaleReader->getLocaleUrlMap();
         $localeUrlMap = $this->filterLocales($localeUrlMap);
         $availableLocales = array_keys($localeUrlMap);
@@ -30,11 +24,17 @@ class LocaleRedirectController
             acceptLanguageHeader: $request->header('Accept-Language', ''),
         );
 
-        if ($matchedLocale === null) {
-            return $this->noCacheRedirect($fallbackUrl);
+        $redirectUrl = $matchedLocale !== null
+            ? $localeUrlMap[$matchedLocale]
+            : $this->fallbackUrl();
+
+        // Preserve query parameters
+        $queryString = $request->getQueryString();
+        if ($queryString !== null && $queryString !== '') {
+            $redirectUrl .= (str_contains($redirectUrl, '?') ? '&' : '?') . $queryString;
         }
 
-        return $this->noCacheRedirect($localeUrlMap[$matchedLocale]);
+        return $this->noCacheRedirect($redirectUrl);
     }
 
     private function fallbackUrl(): string
@@ -69,39 +69,5 @@ class LocaleRedirectController
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Vary' => 'Accept-Language',
         ]);
-    }
-
-    private function isBot(Request $request): bool
-    {
-        $userAgent = $request->header('User-Agent', '');
-
-        if ($userAgent === '') {
-            return true;
-        }
-
-        $botPatterns = [
-            'bot',
-            'crawl',
-            'spider',
-            'slurp',
-            'mediapartners',
-            'facebookexternalhit',
-            'embedly',
-            'quora link preview',
-            'outbrain',
-            'pinterest',
-            'semrush',
-            'ahrefs',
-        ];
-
-        $userAgentLower = strtolower($userAgent);
-
-        foreach ($botPatterns as $pattern) {
-            if (str_contains($userAgentLower, $pattern)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
