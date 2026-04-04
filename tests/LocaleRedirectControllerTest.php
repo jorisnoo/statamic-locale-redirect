@@ -33,30 +33,6 @@ test('it redirects to default site when no locale matches', function () {
         ->assertStatus(302);
 });
 
-test('it redirects bots to default site', function () {
-    $this->get('/', [
-        'Accept-Language' => 'fr',
-        'User-Agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-    ])->assertRedirect('/en')
-        ->assertStatus(302);
-});
-
-test('it redirects crawlers to default site', function () {
-    $this->get('/', [
-        'Accept-Language' => 'fr',
-        'User-Agent' => 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
-    ])->assertRedirect('/en')
-        ->assertStatus(302);
-});
-
-test('it redirects requests without user agent to default site', function () {
-    $this->get('/', [
-        'Accept-Language' => 'fr',
-        'User-Agent' => '',
-    ])->assertRedirect('/en')
-        ->assertStatus(302);
-});
-
 test('it does not intercept non home routes', function () {
     $this->get('/about', ['Accept-Language' => 'fr'])
         ->assertOk()
@@ -134,12 +110,10 @@ test('fallback redirects to configured url when set', function () {
         ->assertStatus(302);
 });
 
-test('bot redirects to configured fallback url when set', function () {
-    config(['statamic.locale-redirect.fallback' => '/custom-landing']);
-
+test('bots are redirected by locale like regular requests', function () {
     $this->get('/', [
         'Accept-Language' => 'fr',
         'User-Agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-    ])->assertRedirect('/custom-landing')
+    ])->assertRedirect('/fr')
         ->assertStatus(302);
 });
