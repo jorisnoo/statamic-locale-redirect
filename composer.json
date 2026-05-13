@@ -1,12 +1,20 @@
 {
     "name": "jorisnoo/statamic-locale-redirect",
     "description": "A Statamic addon that redirects visitors to the locale-specific home route.",
-    "keywords": ["statamic", "locale", "redirect", "language", "i18n"],
+    "keywords": [
+        "statamic",
+        "statamic-addon",
+        "locale",
+        "redirect",
+        "language",
+        "i18n"
+    ],
     "license": "MIT",
     "authors": [
         {
             "name": "Joris Noordermeer",
-            "email": "contact@noordermeer.ch"
+            "email": "contact@noordermeer.ch",
+            "homepage": "https://github.com/jorisnoo"
         }
     ],
     "require": {
