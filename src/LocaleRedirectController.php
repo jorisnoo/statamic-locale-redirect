@@ -13,7 +13,7 @@ class LocaleRedirectController
         private BrowserLocaleMatcher $browserLocaleMatcher,
     ) {}
 
-    public function __invoke(Request $request): RedirectResponse
+    public function __invoke(Request $request): ?RedirectResponse
     {
         $localeUrlMap = $this->siteLocaleReader->getLocaleUrlMap();
         $localeUrlMap = $this->filterLocales($localeUrlMap);
@@ -28,6 +28,10 @@ class LocaleRedirectController
             ? $localeUrlMap[$matchedLocale]
             : $this->fallbackUrl();
 
+        if ($this->targetsCurrentUrl($request, $redirectUrl)) {
+            return null;
+        }
+
         // Preserve query parameters
         $queryString = $request->getQueryString();
         if ($queryString !== null && $queryString !== '') {
@@ -35,6 +39,13 @@ class LocaleRedirectController
         }
 
         return $this->noCacheRedirect($redirectUrl);
+    }
+
+    private function targetsCurrentUrl(Request $request, string $redirectUrl): bool
+    {
+        $absoluteRedirectUrl = redirect($redirectUrl)->getTargetUrl();
+
+        return rtrim($absoluteRedirectUrl, '/') === rtrim($request->url(), '/');
     }
 
     private function fallbackUrl(): string

@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Noo\LocaleRedirect\LocaleRedirectController;
+use Noo\LocaleRedirect\LocaleRedirectMiddleware;
+use Statamic\Http\Controllers\FrontendController;
 
 test('config is merged with defaults', function () {
     expect(config('statamic.locale-redirect'))
@@ -44,5 +45,6 @@ test('root route is registered', function () {
     );
 
     expect($route)->not->toBeNull();
-    expect($route->getActionName())->toBe(LocaleRedirectController::class);
+    expect($route->getActionName())->toBe(FrontendController::class.'@index');
+    expect($route->gatherMiddleware())->toContain(LocaleRedirectMiddleware::class);
 });

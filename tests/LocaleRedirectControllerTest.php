@@ -1,5 +1,6 @@
 <?php
 
+use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 
 uses(Noo\LocaleRedirect\Tests\Concerns\DefinesWebRoutes::class);
@@ -108,6 +109,64 @@ test('fallback redirects to configured url when set', function () {
     $this->get('/', ['Accept-Language' => 'ja'])
         ->assertRedirect('/custom-landing')
         ->assertStatus(302);
+});
+
+test('default site at root serves the homepage when its locale matches', function () {
+    Site::setSites([
+        'en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US'],
+        'fr' => ['name' => 'French', 'url' => '/fr', 'locale' => 'fr_FR'],
+    ]);
+
+    Data::shouldReceive('findByRequestUrl')
+        ->once()
+        ->andReturn(response('homepage'));
+
+    $this->get('/', ['Accept-Language' => 'en'])
+        ->assertOk()
+        ->assertSee('homepage');
+});
+
+test('domain based site serves the homepage when already on the matched domain', function () {
+    Site::setSites([
+        'en' => ['name' => 'English', 'url' => 'http://en.example.com/', 'locale' => 'en_US'],
+        'fr' => ['name' => 'French', 'url' => 'http://fr.example.com/', 'locale' => 'fr_FR'],
+    ]);
+
+    Data::shouldReceive('findByRequestUrl')
+        ->once()
+        ->andReturn(response('homepage'));
+
+    $this->get('http://en.example.com/', ['Accept-Language' => 'en'])
+        ->assertOk()
+        ->assertSee('homepage');
+});
+
+test('single site install serves the homepage', function () {
+    config(['statamic.system.multisite' => false]);
+
+    Site::setSites([
+        'en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US'],
+    ]);
+
+    Data::shouldReceive('findByRequestUrl')
+        ->once()
+        ->andReturn(response('homepage'));
+
+    $this->get('/', ['Accept-Language' => 'en'])
+        ->assertOk()
+        ->assertSee('homepage');
+});
+
+test('fallback at root serves the homepage when no locale matches', function () {
+    config(['statamic.locale-redirect.fallback' => '/']);
+
+    Data::shouldReceive('findByRequestUrl')
+        ->once()
+        ->andReturn(response('homepage'));
+
+    $this->get('/?campaign=summer', ['Accept-Language' => 'ja'])
+        ->assertOk()
+        ->assertSee('homepage');
 });
 
 test('bots are redirected by locale like regular requests', function () {
