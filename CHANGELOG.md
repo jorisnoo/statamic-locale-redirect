@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.3](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/v0.1.3) (2026-07-10)
+## [0.1.3](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/0.1.3) (2026-07-10)
 
 ### Features
 
@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
 - **deps:** bump actions/checkout from 6 to 7 ([ae91220](https://github.com/jorisnoo/statamic-locale-redirect/commit/ae91220b123cf32a6243a87ca334fd01e0353cab))
 - **deps:** bump actions/checkout from 4 to 6 ([62542b8](https://github.com/jorisnoo/statamic-locale-redirect/commit/62542b84349128f830c232f300c7b2d6370f39ce))
 - add dependabot configuration and auto-merge workflow ([0bf1b5b](https://github.com/jorisnoo/statamic-locale-redirect/commit/0bf1b5b891547eadb5c88f2c86c554df8187425c))
-## [0.1.2](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/v0.1.2) (2026-07-10)
+## [0.1.2](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/0.1.2) (2026-07-10)
 
 ### Features
 
@@ -46,7 +46,7 @@ All notable changes to this project will be documented in this file.
 - **deps:** bump actions/checkout from 6 to 7 ([ae91220](https://github.com/jorisnoo/statamic-locale-redirect/commit/ae91220b123cf32a6243a87ca334fd01e0353cab))
 - **deps:** bump actions/checkout from 4 to 6 ([62542b8](https://github.com/jorisnoo/statamic-locale-redirect/commit/62542b84349128f830c232f300c7b2d6370f39ce))
 - add dependabot configuration and auto-merge workflow ([0bf1b5b](https://github.com/jorisnoo/statamic-locale-redirect/commit/0bf1b5b891547eadb5c88f2c86c554df8187425c))
-## [0.1.1](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/v0.1.1) (2026-03-17)
+## [0.1.1](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/0.1.1) (2026-03-17)
 
 ### Code Refactoring
 
@@ -55,7 +55,7 @@ All notable changes to this project will be documented in this file.
 ### Chores
 
 - add shipmark release configuration ([92f6662](https://github.com/jorisnoo/statamic-locale-redirect/commit/92f66629b9e1ee11e7432162d5579144f97b4d93))
-## [0.1.0](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/v0.1.0) (2026-03-17)
+## [0.1.0](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/0.1.0) (2026-03-17)
 
 ### Features
 
