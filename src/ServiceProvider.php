@@ -16,7 +16,8 @@ class ServiceProvider extends AddonServiceProvider
         ], 'locale-redirect');
 
         if (config('statamic.routes.enabled')) {
-            $this->app->make(Router::class)->prependMiddlewareToGroup('statamic.web', LocaleRedirectMiddleware::class);
+            // Statamic 5 creates this group after addon boot; push also initializes it.
+            $this->app->make(Router::class)->pushMiddlewareToGroup('statamic.web', LocaleRedirectMiddleware::class);
             $this->excludeFromStaticCache();
         }
     }
