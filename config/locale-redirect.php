@@ -7,8 +7,8 @@ return [
     | Exclude Locales
     |--------------------------------------------------------------------------
     |
-    | An array of locale codes to exclude from being redirect targets.
-    | For example: ['de', 'it']
+    | Site handles, full locale tags, or languages to exclude from matching.
+    | For example: ['swiss_german', 'en-GB', 'it']
     |
     */
 
@@ -32,8 +32,8 @@ return [
     | Fallback URL
     |--------------------------------------------------------------------------
     |
-    | The URL to redirect to when no browser locale matches or when a bot
-    | visits the root URL. When null, the default Statamic site URL is used.
+    | The URL to redirect to when no browser locale matches. When null, the
+    | first site on the current origin is used (the default when present).
     |
     */
 

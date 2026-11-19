@@ -6,50 +6,46 @@ use Closure;
 use Illuminate\Http\Request;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 
-/**
- * For sites whose default site moved from the root to a prefix (e.g. "/" to
- * "/de"): a URL outside every site prefix that names a published entry on the
- * default site is moved permanently to that entry's prefixed address. The
- * root is left to the locale redirect, anything else falls through.
- */
 class UnprefixedUrlRedirectMiddleware
 {
     public function handle(Request $request, Closure $next): mixed
     {
-        if (! config('statamic.locale-redirect.redirect_unprefixed') || ! $request->isMethodSafe()) {
+        if (! config('statamic.locale-redirect.redirect_unprefixed')) {
             return $next($request);
         }
 
-        $path = '/' . ltrim($request->path(), '/');
-
-        if ($path === '/' || $this->isUnderASitePrefix($path)) {
+        $site = Site::default();
+        $base = RedirectTarget::absolute($site->url());
+        if (! RedirectTarget::sameOrigin($request, $base) || $this->ownedBySite($request)) {
             return $next($request);
         }
 
-        $entry = Entry::findByUri($path, Site::default()->handle());
+        $entry = Entry::findByUri('/' . ltrim($request->path(), '/'), $site->handle());
 
         if ($entry?->status() !== 'published') {
             return $next($request);
         }
 
-        $redirectUrl = $entry->url();
-
-        $queryString = $request->getQueryString();
-        if ($queryString !== null && $queryString !== '') {
-            $redirectUrl .= '?' . $queryString;
+        // Move the route, not the destination of an entry's editorial redirect.
+        // Statamic still applies that redirect's own status, query and fragment.
+        $target = rtrim($base, '/') . '/' . ltrim($entry->uri(), '/');
+        if (RedirectTarget::isCurrent($request, $target)) {
+            return $next($request);
         }
 
-        return redirect($redirectUrl, 301);
+        return redirect()->away(RedirectTarget::withQuery($request, $target), 301);
     }
 
-    private function isUnderASitePrefix(string $path): bool
+    private function ownedBySite(Request $request): bool
     {
-        return Site::all()->contains(function ($site) use ($path) {
-            $prefix = rtrim(URL::makeRelative($site->url()), '/');
+        $path = rtrim(parse_url($request->url(), PHP_URL_PATH) ?? '', '/') . '/';
 
-            return $prefix !== '' && ($path === $prefix || str_starts_with($path, $prefix . '/'));
+        return Site::all()->contains(function ($site) use ($request, $path) {
+            $home = RedirectTarget::absolute($site->url());
+            $prefix = rtrim(parse_url($home, PHP_URL_PATH) ?? '', '/') . '/';
+
+            return RedirectTarget::sameOrigin($request, $home) && str_starts_with($path, $prefix);
         });
     }
 }

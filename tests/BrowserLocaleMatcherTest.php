@@ -67,3 +67,12 @@ test('it matches lower priority locale when higher is unavailable', function () 
 
     expect($result)->toBe('fr');
 });
+
+test('quality weights are case insensitive, bounded and must be positive', function ($header, $match) {
+    expect((new BrowserLocaleMatcher())->match(['en', 'fr'], $header))->toBe($match);
+})->with([
+    ['de, fr;q=0', null],
+    ['fr;Q=0.1, en;q=0.9', 'en'],
+    ['fr;q=-0.1', null],
+    ['en;q=1, fr;q=2', 'en'],
+]);

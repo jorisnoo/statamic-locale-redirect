@@ -15,20 +15,22 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__ . '/../config/locale-redirect.php' => config_path('statamic/locale-redirect.php'),
         ], 'locale-redirect');
 
-        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
-
-        $this->app->make(Router::class)->pushMiddlewareToGroup('statamic.web', UnprefixedUrlRedirectMiddleware::class);
-
-        $this->excludeFromStaticCache();
+        if (config('statamic.routes.enabled')) {
+            $this->app->make(Router::class)->prependMiddlewareToGroup('statamic.web', LocaleRedirectMiddleware::class);
+            $this->excludeFromStaticCache();
+        }
     }
 
     private function excludeFromStaticCache(): void
     {
-        $exclude = config('statamic.static_caching.exclude', []);
+        $key = 'statamic.static_caching.exclude';
+        if (! array_is_list(config($key, []))) {
+            $key .= '.urls';
+        }
 
-        if (! in_array('/', $exclude)) {
-            $exclude[] = '/';
-            config(['statamic.static_caching.exclude' => $exclude]);
+        $urls = config($key, []);
+        if (! in_array('/', $urls, true)) {
+            config([$key => [...$urls, '/']]);
         }
     }
 }
