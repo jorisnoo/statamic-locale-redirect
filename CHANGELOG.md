@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-11-19
+
+### Added
+
+- Optional `redirect_unprefixed` setting for sites whose default site moved from the root to a prefix. When enabled, a `GET` or `HEAD` request for a URL outside every site prefix that matches a published entry on the default site is redirected (`301`) to that entry's prefixed URL, keeping the query string. Disabled by default; add `'redirect_unprefixed' => true` to the published config to enable it.
+
 ## [0.1.3](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/0.1.3) (2026-07-10)
 
 ### Features
