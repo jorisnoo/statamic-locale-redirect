@@ -20,21 +20,20 @@ A Statamic addon that automatically redirects visitors from `/` to their locale-
 ## Installation
 
 ```bash
-composer require noordermeer/statamic-locale-redirect
+composer require jorisnoo/statamic-locale-redirect
 ```
 
 That's it. The addon registers itself automatically via Laravel's package discovery.
 
 ## How It Works
 
-When a visitor hits your site's root URL (`/`), the middleware:
+Only `GET` and `HEAD` requests handled by Statamic's frontend catch-all are eligible. The addon does not register `/`, override Laravel or `Route::statamic()` routes, or run in headless installations.
 
-1. Reads the `Accept-Language` header from the browser
-2. Fetches all configured Statamic site locales and their URLs
-3. Finds the best match between browser preferences and available locales
-4. Issues a `302` redirect to the matched locale's home URL
+At the application root, the addon considers sites on the request's configured origin (scheme, host and port). Relative site URLs and a relative `fallback` are resolved against `APP_URL`, so include your application mount path there. A dedicated domain keeps its own homepage, even when the browser asks for another language.
 
-If no match is found, the visitor is redirected to the default site's URL (or a configured fallback). Query parameters are preserved through the redirect.
+Language preferences are considered in quality order. An exact locale (e.g. `en-GB`) wins before a language-only match; ties use site definition order, default site first. A match gets a temporary `302`. If nothing matches, the addon uses `fallback`, or the first site on the current origin. It never redirects to the same homepage. Both redirects and passthrough homepage responses vary on `Accept-Language`.
+
+When a root site shares its origin with prefixed locales, link to `/?locale_redirect=off` in your language switcher to explicitly select the root homepage regardless of browser preferences. Statamic token requests also bypass language negotiation.
 
 ## Configuration
 
@@ -57,7 +56,7 @@ return [
 
 ### Exclude Locales
 
-Prevent specific locales from being redirect targets:
+Exclude site handles, full locale tags (`en_GB` or `en-GB`), or whole languages from matching:
 
 ```php
 'exclude' => ['de', 'it'],
@@ -79,7 +78,9 @@ When a site that used to live at the root moves under a prefix (e.g. from `/` to
 'redirect_unprefixed' => true,
 ```
 
-A `GET` or `HEAD` request for a path outside every site prefix that matches a published entry on the default site gets a `301` redirect to that entry's URL, so `/about` becomes `/de/about`. Query parameters are preserved. The root stays with the locale redirect, and paths without a matching published entry are left alone, so they still reach the 404 page or your redirect manager.
+Migration is scoped to the default site's configured origin. On that origin, any site rooted at `/` (or at the application mount) owns all its paths; otherwise existing site prefixes and explicitly registered routes take precedence. For an unclaimed path such as `/about`, a published default-site entry yields a `301` to its canonical prefixed route (`/de/about`). An entry configured to redirect elsewhere is still moved to **its route**, where Statamic applies its original destination and status. No query parameters are forwarded directly to an editorial redirect target.
+
+Both migration and language redirects retain the original query string, including duplicate keys, order and encoding. The root stays with language negotiation, and unmatched paths, drafts and methods other than `GET` and `HEAD` fall through.
 
 ## Testing
 

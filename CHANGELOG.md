@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-11-19
+
+### Changed
+
+- Language negotiation and optional permanent URL migration now run only on Statamic's frontend catch-all for the configured origin. Apps with custom routes or domain-based sites keep their own homepages. Set `APP_URL` to the public installation URL, including any mount path, when using relative site URLs.
+- Regional site locales now match before language-only fallbacks. Site handles and full locales may be used in `only` and `exclude`. Language switchers can use `/?locale_redirect=off` to keep a visitor on the root site.
+
+### Fixed
+
+- Root responses vary on language, the actual static-cache excluder excludes `/`, and zero-quality language choices are skipped.
+- Migration redirects respect root sites, mounted installations, published entry routes and editorial redirect statuses. Redirects preserve raw query strings, including repeated parameters.
+
 ## [0.2.0] - 2026-11-19
 
 ### Added
@@ -30,28 +42,17 @@ All notable changes to this project will be documented in this file.
 - **deps:** bump actions/checkout from 6 to 7 ([ae91220](https://github.com/jorisnoo/statamic-locale-redirect/commit/ae91220b123cf32a6243a87ca334fd01e0353cab))
 - **deps:** bump actions/checkout from 4 to 6 ([62542b8](https://github.com/jorisnoo/statamic-locale-redirect/commit/62542b84349128f830c232f300c7b2d6370f39ce))
 - add dependabot configuration and auto-merge workflow ([0bf1b5b](https://github.com/jorisnoo/statamic-locale-redirect/commit/0bf1b5b891547eadb5c88f2c86c554df8187425c))
-## [0.1.2](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/0.1.2) (2026-07-10)
 
-### Features
-
-- preserve query parameters in redirects and remove bot detection ([dbe0597](https://github.com/jorisnoo/statamic-locale-redirect/commit/dbe0597cea4e1a5d6dc10541e15256824b7be6bf))
+## [0.1.2](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/0.1.2) (2026-04-03)
 
 ### Bug Fixes
 
-- prevent redirect loop when locale target is the current url ([fd2f744](https://github.com/jorisnoo/statamic-locale-redirect/commit/fd2f7443f70e868d27a688bf47e1d7661478c345))
 - prevent caching of locale redirects ([5b17d61](https://github.com/jorisnoo/statamic-locale-redirect/commit/5b17d610c622a3efe06e19c1b5a54a6abde282e0))
-
-### Tests
-
-- remove bot detection tests ([2e8ff95](https://github.com/jorisnoo/statamic-locale-redirect/commit/2e8ff9581f8869e24299e61a5e3b8a0294391968))
 
 ### Chores
 
-- add justfile ([73cf044](https://github.com/jorisnoo/statamic-locale-redirect/commit/73cf0444ac7f64dfa1fb15495d5f7b83b805147f))
-- rename LICENSE to LICENSE.md and add author homepage ([f7b73ad](https://github.com/jorisnoo/statamic-locale-redirect/commit/f7b73ada211fcefcc89a8684ad09772bdb9d3384))
-- **deps:** bump actions/checkout from 6 to 7 ([ae91220](https://github.com/jorisnoo/statamic-locale-redirect/commit/ae91220b123cf32a6243a87ca334fd01e0353cab))
-- **deps:** bump actions/checkout from 4 to 6 ([62542b8](https://github.com/jorisnoo/statamic-locale-redirect/commit/62542b84349128f830c232f300c7b2d6370f39ce))
 - add dependabot configuration and auto-merge workflow ([0bf1b5b](https://github.com/jorisnoo/statamic-locale-redirect/commit/0bf1b5b891547eadb5c88f2c86c554df8187425c))
+
 ## [0.1.1](https://github.com/jorisnoo/statamic-locale-redirect/releases/tag/0.1.1) (2026-03-17)
 
 ### Code Refactoring
@@ -94,17 +95,3 @@ All notable changes to this project will be documented in this file.
 - remove badge links from README ([7a41f15](https://github.com/jorisnoo/statamic-locale-redirect/commit/7a41f153068d28d32f9bd4b420470d9489b222b1))
 - add project meta files (editorconfig, CI workflow, changelog, license, readme) ([93c2dfe](https://github.com/jorisnoo/statamic-locale-redirect/commit/93c2dfed8c85dfc3d12b52dd08a50b3e27222085))
 - rename namespace from Noordermeer to Noo, update metadata, and remove empty routes file ([c905c8f](https://github.com/jorisnoo/statamic-locale-redirect/commit/c905c8fc0d2c2f9ae8fbd2c6c45c8301008c327a))
-The format is based on [Keep a Changelog](https://keepachangelog.com), and this project adheres to [Semantic Versioning](https://semver.org).
-
-## [1.0.0] - Unreleased
-
-### Added
-
-- Package scaffolding with Statamic addon service provider
-- Read Statamic multi-site locales and their URLs
-- Match browser `Accept-Language` header to available site locales
-- Redirect from `/` to the best-matching locale home URL (302)
-- Exclude specific locales from redirect targets via config
-- Restrict redirection to specific locales via `only` config option
-- Publishable configuration file (`locale-redirect.php`)
-- Bot and crawler detection to skip redirection for search engines

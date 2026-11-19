@@ -176,3 +176,36 @@ test('bots are redirected by locale like regular requests', function () {
     ])->assertRedirect('/fr')
         ->assertStatus(302);
 });
+
+test('domain homepages belong to their site independent of visitor language', function ($language) {
+    Site::setSites([
+        'en' => ['url' => 'https://en.example.test/', 'locale' => 'en_US'],
+        'fr' => ['url' => 'https://fr.example.test/', 'locale' => 'fr_FR'],
+    ]);
+    Data::shouldReceive('findByRequestUrl')->once()->andReturn(response('French home'));
+    $this->get('https://fr.example.test/', ['Accept-Language' => $language])
+        ->assertOk()->assertSee('French home')->assertHeader('Vary', 'Accept-Language');
+})->with(['', 'en-US']);
+
+test('a mismatched proxy scheme does not redirect a root to itself', function () {
+    config(['statamic.locale-redirect.fallback' => 'https://LOCALHOST:443/']);
+    Data::shouldReceive('findByRequestUrl')->once()->andReturn(response('root'));
+    $this->get('http://localhost/', ['Accept-Language' => 'ja'])->assertOk();
+});
+
+test('an explicit locale switch keeps a root homepage available', function () {
+    Site::setSites([
+        'us' => ['url' => '/', 'locale' => 'en_US'],
+        'gb' => ['url' => '/uk', 'locale' => 'en_GB'],
+    ]);
+    Data::shouldReceive('findByRequestUrl')->once()->andReturn(response('US home'));
+    $this->get('/?locale_redirect=off', ['Accept-Language' => 'en-GB'])
+        ->assertOk()->assertSee('US home');
+});
+
+test('root retains ordered raw query pairs before a target fragment', function () {
+    config(['statamic.locale-redirect.fallback' => '/welcome?src=site#hello']);
+    $this->get('/?item=a%20b&item=c&flag', ['Accept-Language' => 'ja'])
+        ->assertHeader('Location', 'http://localhost/welcome?src=site&item=a%20b&item=c&flag#hello')
+        ->assertHeader('Vary', 'Accept-Language');
+});

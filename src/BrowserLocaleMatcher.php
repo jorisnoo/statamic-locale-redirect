@@ -15,15 +15,28 @@ class BrowserLocaleMatcher
 
         $preferences = $this->parseAcceptLanguage($acceptLanguageHeader);
 
+        $tags = array_map(self::normalize(...), $availableLocales);
         foreach ($preferences as $preferred) {
-            foreach ($availableLocales as $locale) {
-                if ($locale === $preferred || str_starts_with($preferred, $locale . '-') || str_starts_with($preferred, $locale . '_')) {
-                    return $locale;
+            $tag = self::normalize($preferred);
+            $exact = array_search($tag, $tags, true);
+            if ($exact !== false) {
+                return $availableLocales[$exact];
+            }
+
+            $language = explode('-', $tag, 2)[0];
+            foreach ($tags as $key => $candidate) {
+                if (explode('-', $candidate, 2)[0] === $language) {
+                    return $availableLocales[$key];
                 }
             }
         }
 
         return null;
+    }
+
+    public static function normalize(string $locale): string
+    {
+        return strtolower(str_replace('_', '-', $locale));
     }
 
     /**
@@ -48,12 +61,14 @@ class BrowserLocaleMatcher
 
             foreach (array_slice($segments, 1) as $segment) {
                 $segment = trim($segment);
-                if (str_starts_with($segment, 'q=')) {
-                    $quality = (float) substr($segment, 2);
+                if (str_starts_with(strtolower($segment), 'q=')) {
+                    $quality = min(1.0, (float) substr($segment, 2));
                 }
             }
 
-            $entries[] = ['locale' => $locale, 'quality' => $quality];
+            if ($quality > 0) {
+                $entries[] = ['locale' => $locale, 'quality' => $quality];
+            }
         }
 
         usort($entries, fn ($a, $b) => $b['quality'] <=> $a['quality']);

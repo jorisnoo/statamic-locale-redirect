@@ -3,8 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Noo\LocaleRedirect\LocaleRedirectMiddleware;
-use Noo\LocaleRedirect\UnprefixedUrlRedirectMiddleware;
-use Statamic\Http\Controllers\FrontendController;
+use Statamic\StaticCaching\UrlExcluder;
 
 test('config is merged with defaults', function () {
     expect(config('statamic.locale-redirect'))
@@ -30,8 +29,8 @@ test('default config does not redirect unprefixed urls', function () {
     expect(config('statamic.locale-redirect.redirect_unprefixed'))->toBeFalse();
 });
 
-test('unprefixed url redirect runs on statamic web routes', function () {
-    expect(Route::getMiddlewareGroups()['statamic.web'])->toContain(UnprefixedUrlRedirectMiddleware::class);
+test('root and migration checks run only through the statamic web group', function () {
+    expect(Route::getMiddlewareGroups()['statamic.web'])->toContain(LocaleRedirectMiddleware::class);
 });
 
 test('config is publishable', function () {
@@ -48,12 +47,14 @@ test('config is publishable', function () {
     expect($destinationFiles[0])->toEndWith('statamic/locale-redirect.php');
 });
 
-test('root route is registered', function () {
-    $route = Route::getRoutes()->match(
-        request()->create('/', 'GET')
-    );
+test('the frontend catch-all handles root without an addon route', function () {
+    $route = Route::getRoutes()->match(request()->create('/', 'GET'));
 
-    expect($route)->not->toBeNull();
-    expect($route->getActionName())->toBe(FrontendController::class.'@index');
-    expect($route->gatherMiddleware())->toContain(LocaleRedirectMiddleware::class);
+    expect($route->getName())->toBe('statamic.site');
+    expect(Route::getRoutes()->getRoutesByMethod()['GET'])->not->toHaveKey('/');
+});
+
+test('the bound static cache excluder excludes the homepage', function () {
+    config(['statamic.static_caching.strategy' => 'full']);
+    expect(app(UrlExcluder::class)->isExcluded(url('/')))->toBeTrue();
 });
