@@ -31,3 +31,6 @@ phpstan.neon
 testbench.yaml
 /docs
 /coverage
+
+# Statamic test stache
+/tests/__fixtures__/dev-null

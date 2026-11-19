@@ -2,6 +2,7 @@
 
 namespace Noo\LocaleRedirect;
 
+use Illuminate\Routing\Router;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
@@ -15,6 +16,8 @@ class ServiceProvider extends AddonServiceProvider
         ], 'locale-redirect');
 
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+
+        $this->app->make(Router::class)->pushMiddlewareToGroup('statamic.web', UnprefixedUrlRedirectMiddleware::class);
 
         $this->excludeFromStaticCache();
     }

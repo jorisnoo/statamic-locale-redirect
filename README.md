@@ -9,6 +9,7 @@ A Statamic addon that automatically redirects visitors from `/` to their locale-
 - Redirects from `/` to the best-matching locale home URL (e.g. `/en`, `/fr`, `/de`)
 - Preserves query parameters through the redirect
 - Configurable locale exclusions and restrictions
+- Optional permanent redirects from unprefixed URLs, for sites whose default site moved under a prefix
 - Zero configuration required for basic usage
 
 ## Requirements
@@ -49,6 +50,8 @@ This creates `config/statamic/locale-redirect.php`:
 return [
     'exclude' => [],
     'only' => [],
+    'fallback' => null,
+    'redirect_unprefixed' => false,
 ];
 ```
 
@@ -67,6 +70,16 @@ Only allow redirection to specific locales. When set, `only` takes precedence ov
 ```php
 'only' => ['en', 'fr'],
 ```
+
+### Redirect Unprefixed URLs
+
+When a site that used to live at the root moves under a prefix (e.g. from `/` to `/de`), its old URLs stop working. Enable this option to redirect them:
+
+```php
+'redirect_unprefixed' => true,
+```
+
+A `GET` or `HEAD` request for a path outside every site prefix that matches a published entry on the default site gets a `301` redirect to that entry's URL, so `/about` becomes `/de/about`. Query parameters are preserved. The root stays with the locale redirect, and paths without a matching published entry are left alone, so they still reach the 404 page or your redirect manager.
 
 ## Testing
 

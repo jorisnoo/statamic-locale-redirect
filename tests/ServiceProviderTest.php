@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Noo\LocaleRedirect\LocaleRedirectMiddleware;
+use Noo\LocaleRedirect\UnprefixedUrlRedirectMiddleware;
 use Statamic\Http\Controllers\FrontendController;
 
 test('config is merged with defaults', function () {
@@ -23,6 +24,14 @@ test('default config has empty only array', function () {
 
 test('default config has null fallback', function () {
     expect(config('statamic.locale-redirect.fallback'))->toBeNull();
+});
+
+test('default config does not redirect unprefixed urls', function () {
+    expect(config('statamic.locale-redirect.redirect_unprefixed'))->toBeFalse();
+});
+
+test('unprefixed url redirect runs on statamic web routes', function () {
+    expect(Route::getMiddlewareGroups()['statamic.web'])->toContain(UnprefixedUrlRedirectMiddleware::class);
 });
 
 test('config is publishable', function () {

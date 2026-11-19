@@ -39,4 +39,18 @@ return [
 
     'fallback' => null,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect Unprefixed URLs
+    |--------------------------------------------------------------------------
+    |
+    | For sites whose default site moved from the root to a prefix, e.g. from
+    | "/" to "/de". When enabled, a URL outside every site prefix that matches
+    | a published entry on the default site is redirected (301) to that
+    | entry's prefixed URL: "/about" becomes "/de/about".
+    |
+    */
+
+    'redirect_unprefixed' => false,
+
 ];
